@@ -26,6 +26,8 @@ using namespace std;
 #define LCD_LINE_1  0x80                // 첫 번째 라인 주소
 #define LCD_LINE_2  0xC0                // 두 번째 라인 주소
 
+#define INTERVAL_SECOND 10
+
 int lcd_fd; // LCD 파일 디스크립터
 
 struct SensorData {
@@ -115,7 +117,7 @@ int main() {
             // }
             // 위 JSON 데이터를 POST로 전송하는 코드 작성
 
-            CRUL* curl;
+            CURL* curl;
             curl = curl_easy_init();
 
             if (curl) {
@@ -144,9 +146,6 @@ int main() {
             cout << "주의: 센서 읽기 및 처리 시간이 주기보다 깁니다." << endl;
         }
     }
-
-    // 데이터베이스 연결 종료
-    sqlite3_close(db);
 
     return 0;
 }
