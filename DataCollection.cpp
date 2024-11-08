@@ -106,22 +106,11 @@ int main() {
             lcdLoc(LCD_LINE_2);
             typeln(lcd_line2);
 
-            // 데이터베이스에 데이터 저장
-            // localhost:8080/refrigerator-data
-            // {
-            //   "timestamp": "2024-10-07T14:30:00",
-            //   "refrigeratorTemp": 3.5,
-            //   "refrigeratorHumid": 60.2,
-            //   "freezerTemp": -18.4,
-            //   "freezerHumid": 55.8
-            // }
-            // 위 JSON 데이터를 POST로 전송하는 코드 작성
-
             CURL* curl;
             curl = curl_easy_init();
 
             if (curl) {
-                string url = "https://dc4c5100-1c1b-417a-8fd4-f4b745e18e3c.mock.pstmn.io/refrigerator-data";
+                string url = "http://158.180.91.120:8080/refrigerator-data";
                 string data = "{ \"timestamp\": \"" + string(timestamp) + "\", \"refrigeratorTemp\": " + to_string(refrigeratorData.temp/10.0) + ", \"refrigeratorHumid\": " + to_string(refrigeratorData.humid/10.0) + ", \"freezerTemp\": " + to_string(freezerData.temp/10.0) + ", \"freezerHumid\": " + to_string(freezerData.humid/10.0) + " }";
                 curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
                 curl_easy_setopt(curl, CURLOPT_POST, 1L);
