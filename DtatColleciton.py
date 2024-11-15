@@ -40,7 +40,11 @@ def main():
 
             # 데이터 서버 전송
             url = "http://158.180.91.120:8080/refrigerator-data"
-            header = {"Content-Type": "application/json"}
+            header = {
+                "Content-Type": "application/json",
+                "Host": "",
+                "Content-Length": "",  
+            }
             data = {
                 "timestamp": timestamp,
                 "refrigeratorTemp": refrigerator_data.temp / 10.0,
