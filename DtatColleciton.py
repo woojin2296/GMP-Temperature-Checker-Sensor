@@ -1,4 +1,4 @@
-import time, requests
+import time, requests, json
 from datetime import datetime
 
 import board
@@ -46,17 +46,18 @@ def main():
 
             # 데이터 서버 전송
             url = "http://158.180.91.120:8080/refrigerator-data"
-            header = {
-                "Content-Type": "application/json",
-                "Host": "",
-                "Content-Length": "",  
-            }
             data = {
                 "timestamp": timestamp,
                 "refrigeratorTemp": sensor1_data.temp / 10.0,
                 "refrigeratorHumid": sensor1_data.humid / 10.0,
                 "freezerTemp": sensor2_data.temp / 10.0,
                 "freezerHumid": sensor2_data.humid / 10.0,
+            }
+            content_length = str(len(json.dumps(data)))
+            header = {
+                "Content-Type": "application/json",
+                "Host": "158.180.91.120",
+                "Content-Length": content_length,  
             }
             try:
                 response = requests.post(url, json=data, headers=header)
