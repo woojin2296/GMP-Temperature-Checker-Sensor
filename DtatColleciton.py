@@ -40,6 +40,7 @@ def main():
 
             # 데이터 서버 전송
             url = "http://158.180.91.120:8080/refrigerator-data"
+            header = {"Content-Type": "application/json"}
             data = {
                 "timestamp": timestamp,
                 "refrigeratorTemp": refrigerator_data.temp / 10.0,
@@ -48,7 +49,7 @@ def main():
                 "freezerHumid": freezer_data.humid / 10.0,
             }
             try:
-                response = requests.post(url, json=data)
+                response = requests.post(url, json=data, headers=header)
                 if response.status_code == 200:
                     print("데이터 전송 성공")
                 else:
