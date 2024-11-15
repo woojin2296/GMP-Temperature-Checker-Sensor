@@ -7,7 +7,7 @@ import adafruit_dht
 # DHT22 센서를 사용할 GPIO 핀을 지정
 sensor1 = adafruit_dht.DHT22(board.D17) 
 sensor2 = adafruit_dht.DHT22(board.D27)
-# sensor3 = adafruit_dht.DHT22(board.D22)
+sensor3 = adafruit_dht.DHT11(board.D22)
 
 LH_THRESHOLD = 30
 INTERVAL_SEC = 3
@@ -24,10 +24,10 @@ def get_dht22_data():
     sensor2_temperature = sensor2.temperature
     sensor2_humidity = sensor2.humidity
 
-    # sensor3_temperature = sensor3.temperature
-    # sensor3_humidity = sensor3.humidity
+    sensor3_temperature = sensor3.temperature
+    sensor3_humidity = sensor3.humidity
 
-    return SensorData(sensor1_temperature, sensor1_humidity), SensorData(sensor2_temperature, sensor2_humidity)#, SensorData(sensor3_temperature, sensor3_humidity)
+    return SensorData(sensor1_temperature, sensor1_humidity), SensorData(sensor2_temperature, sensor2_humidity), SensorData(sensor3_temperature, sensor3_humidity)
 
 def main():
     print("온습도 센서 데이터 수집 프로그램을 시작합니다.")
@@ -36,11 +36,11 @@ def main():
         start_time = time.time()
 
         try:
-            sensor1_data, sensor2_data = get_dht22_data()
+            sensor1_data, sensor2_data, sensor3_data = get_dht22_data()
 
             print(sensor1_data.temp, sensor1_data.humid)
             print(sensor2_data.temp, sensor2_data.humid)
-            # print(sensor3_data.temp, sensor3_data.humid)
+            print(sensor3_data.temp, sensor3_data.humid)
 
             timestamp = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
@@ -64,7 +64,7 @@ def main():
                 if response.status_code == 200:
                     print("데이터 전송 성공")
                 else:
-                    print("데이터 전송 실패:", response.status_code)
+                    print("데이터 전송 실패:", response)
             except requests.RequestException as e:
                 print("데이터 전송 오류:", e)
 
