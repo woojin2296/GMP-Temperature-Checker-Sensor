@@ -18,7 +18,7 @@ class SensorData:
         self.humid = humid
         self.success = success
 
-def get_dht22_data(pin):
+def get_dht22_data():
     temperature = sensor1.temperature
     humidity = sensor1.humidity
     return SensorData(temperature, humidity, (humidity is not None and temperature is not None))
