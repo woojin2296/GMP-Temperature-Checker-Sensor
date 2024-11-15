@@ -33,6 +33,9 @@ def main():
             refrigerator_data = get_dht22_data()
             freezer_data = get_dht22_data()
 
+            print(refrigerator_data.temp, refrigerator_data.humid)
+            print(freezer_data.temp, freezer_data.humid)
+
             timestamp = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
             # 데이터 서버 전송
