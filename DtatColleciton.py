@@ -7,21 +7,27 @@ import adafruit_dht
 # DHT22 센서를 사용할 GPIO 핀을 지정
 sensor1 = adafruit_dht.DHT22(board.D17) 
 sensor2 = adafruit_dht.DHT22(board.D27)
-sensor2 = adafruit_dht.DHT22(board.D22)
+sensor3 = adafruit_dht.DHT22(board.D22)
 
 LH_THRESHOLD = 30
 INTERVAL_SEC = 3
 
 class SensorData:
-    def __init__(self, temp=0, humid=0, success=False):
+    def __init__(self, temp=0, humid=0):
         self.temp = temp
         self.humid = humid
-        self.success = success
 
 def get_dht22_data():
-    temperature = sensor1.temperature
-    humidity = sensor1.humidity
-    return SensorData(temperature, humidity, (humidity is not None and temperature is not None))
+    sensor1_temperature = sensor1.temperature
+    sensor1_humidity = sensor1.humidity
+
+    sensor2_temperature = sensor2.temperature
+    sensor2_humidity = sensor2.humidity
+
+    sensor3_temperature = sensor3.temperature
+    sensor3_humidity = sensor3.humidity
+
+    return SensorData(sensor1_temperature, sensor1_humidity), SensorData(sensor2_temperature, sensor2_humidity), SensorData(sensor3_temperature, sensor3_humidity)
 
 def main():
     print("온습도 센서 데이터 수집 프로그램을 시작합니다.")
@@ -30,11 +36,11 @@ def main():
         start_time = time.time()
 
         try:
-            refrigerator_data = get_dht22_data()
-            freezer_data = get_dht22_data()
+            sensor1_data, sensor2_data, sensor3_data = get_dht22_data()
 
-            print(refrigerator_data.temp, refrigerator_data.humid)
-            print(freezer_data.temp, freezer_data.humid)
+            print(sensor1_data.temp, sensor1_data.humid)
+            print(sensor2_data.temp, sensor2_data.humid)
+            print(sensor3_data.temp, sensor3_data.humid)
 
             timestamp = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
@@ -47,10 +53,10 @@ def main():
             }
             data = {
                 "timestamp": timestamp,
-                "refrigeratorTemp": refrigerator_data.temp / 10.0,
-                "refrigeratorHumid": refrigerator_data.humid / 10.0,
-                "freezerTemp": freezer_data.temp / 10.0,
-                "freezerHumid": freezer_data.humid / 10.0,
+                "refrigeratorTemp": sensor1_data.temp / 10.0,
+                "refrigeratorHumid": sensor1_data.humid / 10.0,
+                "freezerTemp": sensor2_data.temp / 10.0,
+                "freezerHumid": sensor2_data.humid / 10.0,
             }
             try:
                 response = requests.post(url, json=data, headers=header)
