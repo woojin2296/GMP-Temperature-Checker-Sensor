@@ -1,16 +1,15 @@
-import time
-import requests
+import time, requests
 from datetime import datetime
-import Adafruit_DHT
 
-# DHT22 설정
-sensor = Adafruit_DHT.DHT22
+import board
+import adafruit_dht
 
-# DHT-22 관련 상수 정의
-DHT_GPIO_REFRIGERATOR = 27
-DHT_GPIO_FREEZER = 17
+# DHT22 센서를 사용할 GPIO 핀을 지정
+sensor1 = adafruit_dht.DHT22(board.D17) 
+sensor2 = adafruit_dht.DHT22(board.D27)
+sensor2 = adafruit_dht.DHT22(board.D22)
+
 LH_THRESHOLD = 30
-
 INTERVAL_SEC = 3
 
 class SensorData:
@@ -20,7 +19,8 @@ class SensorData:
         self.success = success
 
 def get_dht22_data(pin):
-    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+    temperature = sensor1.temperature
+    humidity = sensor1.humidity
     return SensorData(temperature, humidity, (humidity is not None and temperature is not None))
 
 def main():
@@ -30,8 +30,8 @@ def main():
         start_time = time.time()
 
         try:
-            refrigerator_data = get_dht22_data(DHT_GPIO_REFRIGERATOR)
-            freezer_data = get_dht22_data(DHT_GPIO_FREEZER)
+            refrigerator_data = get_dht22_data()
+            freezer_data = get_dht22_data()
 
             timestamp = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
