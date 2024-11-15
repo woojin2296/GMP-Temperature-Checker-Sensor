@@ -1,9 +1,10 @@
 import time
 import requests
-import RPi.GPIO as GPIO
 from datetime import datetime
-from smbus2 import SMBus
-import threading
+import Adafruit_DHT
+
+# DHT22 설정
+sensor = Adafruit_DHT.DHT22
 
 # DHT-22 관련 상수 정의
 DHT_GPIO_REFRIGERATOR = 27
@@ -12,57 +13,15 @@ LH_THRESHOLD = 30
 
 INTERVAL_SEC = 3
 
-# LCD 초기화
-bus = SMBus(1)
-
 class SensorData:
     def __init__(self, temp=0, humid=0, success=False):
         self.temp = temp
         self.humid = humid
         self.success = success
 
-def read_data(DHT_GPIO):
-    GPIO.setmode(GPIO.BCM)
-    data = [0] * 5
-    result = SensorData()
-
-    try:
-        GPIO.setup(DHT_GPIO, GPIO.OUT)
-        GPIO.output(DHT_GPIO, GPIO.LOW)
-        time.sleep(0.018)
-        GPIO.output(DHT_GPIO, GPIO.HIGH)
-        GPIO.setup(DHT_GPIO, GPIO.IN)
-
-        # 데이터 읽기
-        for i in range(5):
-            for j in range(8):
-                while GPIO.input(DHT_GPIO) == GPIO.LOW:
-                    continue
-                width = 0
-                while GPIO.input(DHT_GPIO) == GPIO.HIGH:
-                    width += 1
-                    time.sleep(0.000001)
-                    if width > 1000:
-                        break
-                data[i] |= (width > LH_THRESHOLD) << (7 - j)
-
-        humid = data[0] << 8 | data[1]
-        temp = data[2] << 8 | data[3]
-        chk_sum = sum(data[:4]) & 0xFF
-
-        if chk_sum == data[4]:
-            result.success = True
-            result.temp = temp
-            result.humid = humid
-        else:
-            result.success = False
-            print(f"센서 {DHT_GPIO} 읽기 오류: 체크섬 불일치")
-
-    except Exception as e:
-        result.success = False
-        print(f"센서 {DHT_GPIO} 읽기 오류: {e}")
-
-    return result
+def get_dht22_data(pin):
+    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+    return SensorData(temperature, humidity, (humidity is not None and temperature is not None))
 
 def main():
     print("온습도 센서 데이터 수집 프로그램을 시작합니다.")
@@ -71,8 +30,8 @@ def main():
         start_time = time.time()
 
         try:
-            refrigerator_data = read_data(DHT_GPIO_REFRIGERATOR)
-            freezer_data = read_data(DHT_GPIO_FREEZER)
+            refrigerator_data = get_dht22_data(DHT_GPIO_REFRIGERATOR)
+            freezer_data = get_dht22_data(DHT_GPIO_FREEZER)
 
             timestamp = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
 
